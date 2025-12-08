@@ -1,3 +1,4 @@
+<div>
 <!-- STATS:START -->
 <div align="center">
 
@@ -7,14 +8,14 @@
 
 **Profile**
 
-| Metric | Count |
-|--------|-------|
-| Total Stars | 60 |
-| Pull Requests | 78 |
-| Issues | 37 |
-| Contributed Repos | 29 |
-| Current Streak | 2 days |
-| Longest Streak | 41 days |
+| Metric             | Count    |
+| ------------------ | -------- |
+| Total Stars        | 60       |
+| Pull Requests      | 78       |
+| Issues             | 37       |
+| Contributed Repos  | 29       |
+| Current Streak     | 2 days   |
+| Longest Streak     | 41 days  |
 | Active Days (2025) | 186 days |
 
 </td>
@@ -38,3 +39,10 @@
 </div>
 
 <!-- STATS:END -->
+</div>
+
+<div align="center">
+
+[website](https://bosch.dev) / [gpg](https://github.com/fbosch.gpg)
+
+</div>
