@@ -38,45 +38,6 @@ function fetchGitHubAPI(endpoint) {
   });
 }
 
-// Fetch SVG and convert to inline with currentColor
-async function fetchAndInlineSVG(iconName) {
-  return new Promise((resolve, reject) => {
-    // Try plain version first (monochrome), fallback to original
-    const plainUrl = `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${iconName}/${iconName}-plain.svg`;
-    const originalUrl = `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${iconName}/${iconName}-original.svg`;
-    
-    const tryFetch = (url) => {
-      https.get(url, (res) => {
-        let data = '';
-        res.on('data', (chunk) => data += chunk);
-        res.on('end', () => {
-          if (res.statusCode === 200) {
-            // Replace fill colors with currentColor for theme support
-            let svg = data
-              .replace(/fill="[^"]*"/g, 'fill="currentColor"')
-              .replace(/<svg/, '<svg width="16" height="16" style="vertical-align: middle; margin-right: 4px;"');
-            resolve(svg);
-          } else if (url === plainUrl) {
-            // Plain version failed, try original
-            tryFetch(originalUrl);
-          } else {
-            // Both failed, use empty SVG
-            resolve('<svg width="16" height="16"></svg>');
-          }
-        });
-      }).on('error', () => {
-        if (url === plainUrl) {
-          tryFetch(originalUrl);
-        } else {
-          resolve('<svg width="16" height="16"></svg>');
-        }
-      });
-    };
-    
-    tryFetch(plainUrl);
-  });
-}
-
 async function getLanguageStats() {
   const repos = await fetchGitHubAPI(`/users/${USERNAME}/repos?per_page=100&type=all`);
   const languageStats = {};
@@ -101,53 +62,47 @@ async function getLanguageStats() {
   
   const total = sorted.reduce((sum, [, bytes]) => sum + bytes, 0);
   
-  // Language icon name mappings for Devicon
-  const languageIconNames = {
-    'JavaScript': 'javascript',
-    'TypeScript': 'typescript',
-    'Python': 'python',
-    'Java': 'java',
-    'C++': 'cplusplus',
-    'C': 'c',
-    'C#': 'csharp',
-    'Ruby': 'ruby',
-    'Go': 'go',
-    'Rust': 'rust',
-    'PHP': 'php',
-    'Swift': 'swift',
-    'Kotlin': 'kotlin',
-    'Dart': 'dart',
-    'HTML': 'html5',
-    'CSS': 'css3',
-    'Shell': 'bash',
-    'Vue': 'vuejs',
-    'Svelte': 'svelte',
-    'Scala': 'scala',
-    'Lua': 'lua',
-    'R': 'r',
-    'Perl': 'perl',
-    'Haskell': 'haskell',
-    'Elixir': 'elixir',
-    'Clojure': 'clojure',
-    'Objective-C': 'objectivec',
-    'Vim Script': 'vim',
-    'Jupyter Notebook': 'jupyter',
-    'Makefile': 'bash',
-    'Dockerfile': 'docker',
-    'Nix': 'nixos'
+  // GitHub's language colors (official colors used in GitHub UI)
+  const languageColors = {
+    'JavaScript': '#f1e05a',
+    'TypeScript': '#3178c6',
+    'Python': '#3572A5',
+    'Java': '#b07219',
+    'C++': '#f34b7d',
+    'C': '#555555',
+    'C#': '#178600',
+    'Ruby': '#701516',
+    'Go': '#00ADD8',
+    'Rust': '#dea584',
+    'PHP': '#4F5D95',
+    'Swift': '#ffac45',
+    'Kotlin': '#A97BFF',
+    'Dart': '#00B4AB',
+    'HTML': '#e34c26',
+    'CSS': '#563d7c',
+    'Shell': '#89e051',
+    'Vue': '#41b883',
+    'Svelte': '#ff3e00',
+    'Scala': '#c22d40',
+    'Lua': '#000080',
+    'R': '#198CE7',
+    'Perl': '#0298c3',
+    'Haskell': '#5e5086',
+    'Elixir': '#6e4a7e',
+    'Clojure': '#db5855',
+    'Objective-C': '#438eff',
+    'Vim Script': '#199f4b',
+    'Jupyter Notebook': '#DA5B0B',
+    'Makefile': '#427819',
+    'Dockerfile': '#384d54',
+    'Nix': '#7e7eff'
   };
   
-  // Fetch all SVGs in parallel
-  const languagesWithIcons = await Promise.all(
-    sorted.map(async ([lang, bytes]) => {
-      const percentage = ((bytes / total) * 100).toFixed(1);
-      const iconName = languageIconNames[lang] || 'default';
-      const svg = await fetchAndInlineSVG(iconName);
-      return { lang, percentage, svg };
-    })
-  );
-  
-  return languagesWithIcons;
+  return sorted.map(([lang, bytes]) => {
+    const percentage = ((bytes / total) * 100).toFixed(1);
+    const color = languageColors[lang] || '#858585';
+    return { lang, percentage, color };
+  });
 }
 
 async function getStreakStats() {
@@ -348,7 +303,9 @@ async function updateReadme() {
 ${languageStats.map((stat) => {
   const barLength = Math.round(parseFloat(stat.percentage) / 2);
   const bar = '█'.repeat(barLength) + '░'.repeat(50 - barLength);
-  return `${stat.svg} **${stat.lang}** \`${stat.percentage}%\`<br>\`${bar}\``;
+  const encodedLang = encodeURIComponent(stat.lang);
+  const searchUrl = `https://github.com/${USERNAME}?tab=repositories&q=language:${encodedLang}`;
+  return `<span style="color: ${stat.color}">●</span> <a href="${searchUrl}" style="color: inherit; text-decoration: none;"><strong>${stat.lang}</strong></a> <span style="float: right">\`${stat.percentage}%\`</span><br>\`${bar}\``;
 }).join('<br>')}
 
 </td>
