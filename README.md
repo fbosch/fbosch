@@ -13,11 +13,6 @@
 | Pull Requests | 92 |
 | Issues | 37 |
 | Contributed Repos | 29 |
-
-**Streaks**
-
-| Metric | Count |
-|--------|-------|
 | Current Streak | 2 days |
 | Longest Streak | 41 days |
 | Active Days (2025) | 186 days |

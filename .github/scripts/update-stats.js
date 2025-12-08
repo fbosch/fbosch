@@ -292,11 +292,6 @@ async function updateReadme() {
 | Pull Requests | ${contributionStats.totalPRs} |
 | Issues | ${contributionStats.totalIssues} |
 | Contributed Repos | ${contributionStats.contributedTo} |
-
-**Streaks**
-
-| Metric | Count |
-|--------|-------|
 | Current Streak | ${streakStats.currentStreak} days |
 | Longest Streak | ${streakStats.longestStreak} days |
 | Active Days (2025) | ${streakStats.activeDaysThisYear} days |
