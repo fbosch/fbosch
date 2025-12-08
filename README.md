@@ -10,7 +10,7 @@
 | Metric | Count |
 |--------|-------|
 | Total Stars | 60 |
-| Pull Requests | 92 |
+| Pull Requests | 78 |
 | Issues | 37 |
 | Contributed Repos | 29 |
 | Current Streak | 2 days |
