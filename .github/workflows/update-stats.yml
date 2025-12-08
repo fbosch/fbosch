@@ -1,0 +1,52 @@
+name: Update README Stats
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch and update stats
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: fbosch
+        run: node .github/scripts/update-stats.js
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Check if there are changes
+          if [[ -n $(git status --porcelain) ]]; then
+            git add README.md
+            
+            # Check if the last commit was a stats update
+            if git log -1 --pretty=%B | grep -q "chore: update stats"; then
+              # Amend the previous stats commit
+              git commit --amend --no-edit
+            else
+              # Create new commit if last one wasn't a stats update
+              git commit -m "chore: update stats [skip ci]"
+            fi
+            
+            # Force push needed when amending
+            git push --force-with-lease
+          else
+            echo "No changes to commit"
+          fi
