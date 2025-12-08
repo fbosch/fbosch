@@ -324,6 +324,7 @@ ${languageStats.map((stat) => {
     'Dart': 'dart',
     'HTML': 'html5',
     'CSS': 'css3',
+    'SCSS': 'sass',
     'Shell': 'gnubash',
     'Vue': 'vuedotjs',
     'Svelte': 'svelte',
@@ -347,10 +348,10 @@ ${languageStats.map((stat) => {
     ? `https://img.shields.io/badge/${encodedLang}-${stat.percentage}%25-${colorCode}?style=flat&logo=${logo}&logoColor=white`
     : `https://img.shields.io/badge/${encodedLang}-${stat.percentage}%25-${colorCode}?style=flat`;
   
-  const barLength = Math.round(parseFloat(stat.percentage) / 2);
-  const bar = '█'.repeat(barLength) + '░'.repeat(50 - barLength);
+  const barLength = Math.round(parseFloat(stat.percentage) / 2.5);  // Changed from /4 to /2.5 for slightly bigger
+  const bar = '█'.repeat(barLength) + '░'.repeat(40 - barLength);  // Changed from 25 to 40
     
-  return `[![${stat.lang}](${badgeUrl})](${searchUrl})  \n${bar}`;
+  return `[![${stat.lang}](${badgeUrl})](${searchUrl})  \n\`${bar}\``;  // Wrapped in backticks for monospace
 }).join('\n\n')}
 
 </td>
