@@ -41,8 +41,10 @@
 <!-- STATS:END -->
 </div>
 
+---
+
 <div align="center">
 
-[website](https://bosch.dev) / [gpg](https://github.com/fbosch.gpg)
+[website](https://bosch.dev) / [pgp](https://github.com/fbosch.gpg)
 
 </div>
