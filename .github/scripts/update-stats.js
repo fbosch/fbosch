@@ -333,8 +333,8 @@ async function updateReadme() {
 <table>
 ${languageStats
   .map((stat) => {
-    const encodedLang = encodeURIComponent(stat.lang).toLowerCase();
-    const searchUrl = `https://github.com/${USERNAME}?tab=repositories&q=language:${encodedLang}`;
+    const encodedLang = encodeURIComponent(stat.lang);
+    const searchUrl = `https://github.com/${USERNAME}?tab=repositories&q&type=source&language=${encodedLang.toLowerCase()}&sort`;
     // Remove # from color for shields.io
     const colorCode = stat.color.replace("#", "");
 
