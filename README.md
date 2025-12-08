@@ -1,9 +1,9 @@
 <!-- STATS:START -->
 <div align="center">
 
-<table>
+<table width="100%">
 <tr>
-<td valign="top" align="left">
+<td valign="top" width="50%">
 
 **Profile**
 
@@ -18,11 +18,33 @@
 | Active Days (2025) | 186 days |
 
 </td>
-<td valign="top" align="left">
+<td valign="top" width="50%" align="left">
 
 **Languages**
 
-<span style="color: #3178c6">●</span> <a href="https://github.com/fbosch?tab=repositories&q=language:TypeScript" style="color: inherit; text-decoration: none;"><strong>TypeScript</strong></a> <span style="float: right">`67.1%`</span><br>`██████████████████████████████████░░░░░░░░░░░░░░░░`<br><span style="color: #f1e05a">●</span> <a href="https://github.com/fbosch?tab=repositories&q=language:JavaScript" style="color: inherit; text-decoration: none;"><strong>JavaScript</strong></a> <span style="float: right">`11.5%`</span><br>`██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`<br><span style="color: #555555">●</span> <a href="https://github.com/fbosch?tab=repositories&q=language:C" style="color: inherit; text-decoration: none;"><strong>C</strong></a> <span style="float: right">`5.5%`</span><br>`███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`<br><span style="color: #000080">●</span> <a href="https://github.com/fbosch?tab=repositories&q=language:Lua" style="color: inherit; text-decoration: none;"><strong>Lua</strong></a> <span style="float: right">`5.4%`</span><br>`███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`<br><span style="color: #89e051">●</span> <a href="https://github.com/fbosch?tab=repositories&q=language:Shell" style="color: inherit; text-decoration: none;"><strong>Shell</strong></a> <span style="float: right">`5.2%`</span><br>`███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`<br><span style="color: #7e7eff">●</span> <a href="https://github.com/fbosch?tab=repositories&q=language:Nix" style="color: inherit; text-decoration: none;"><strong>Nix</strong></a> <span style="float: right">`2.3%`</span><br>`█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`<br><span style="color: #563d7c">●</span> <a href="https://github.com/fbosch?tab=repositories&q=language:CSS" style="color: inherit; text-decoration: none;"><strong>CSS</strong></a> <span style="float: right">`1.7%`</span><br>`█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`<br><span style="color: #dea584">●</span> <a href="https://github.com/fbosch?tab=repositories&q=language:Rust" style="color: inherit; text-decoration: none;"><strong>Rust</strong></a> <span style="float: right">`1.4%`</span><br>`█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░`
+[![TypeScript](https://img.shields.io/badge/TypeScript-67.1%25-3178c6?style=flat&logo=typescript&logoColor=white)](https://github.com/fbosch?tab=repositories&q=language:TypeScript)  
+██████████████████████████████████░░░░░░░░░░░░░░░░
+
+[![JavaScript](https://img.shields.io/badge/JavaScript-11.5%25-f1e05a?style=flat&logo=javascript&logoColor=white)](https://github.com/fbosch?tab=repositories&q=language:JavaScript)  
+██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+[![C](https://img.shields.io/badge/C-5.5%25-555555?style=flat&logo=c&logoColor=white)](https://github.com/fbosch?tab=repositories&q=language:C)  
+███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+[![Lua](https://img.shields.io/badge/Lua-5.4%25-000080?style=flat&logo=lua&logoColor=white)](https://github.com/fbosch?tab=repositories&q=language:Lua)  
+███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+[![Shell](https://img.shields.io/badge/Shell-5.2%25-89e051?style=flat&logo=gnubash&logoColor=white)](https://github.com/fbosch?tab=repositories&q=language:Shell)  
+███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+[![Nix](https://img.shields.io/badge/Nix-2.3%25-7e7eff?style=flat&logo=nixos&logoColor=white)](https://github.com/fbosch?tab=repositories&q=language:Nix)  
+█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+[![CSS](https://img.shields.io/badge/CSS-1.7%25-563d7c?style=flat&logo=css3&logoColor=white)](https://github.com/fbosch?tab=repositories&q=language:CSS)  
+█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+[![Rust](https://img.shields.io/badge/Rust-1.4%25-dea584?style=flat&logo=rust&logoColor=white)](https://github.com/fbosch?tab=repositories&q=language:Rust)  
+█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
 </td>
 </tr>

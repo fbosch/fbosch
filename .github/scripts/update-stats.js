@@ -279,9 +279,9 @@ async function updateReadme() {
 
     const statsSection = `<div align="center">
 
-<table>
+<table width="100%">
 <tr>
-<td valign="top" align="left">
+<td valign="top" width="50%">
 
 **Profile**
 
@@ -296,17 +296,62 @@ async function updateReadme() {
 | Active Days (2025) | ${streakStats.activeDaysThisYear} days |
 
 </td>
-<td valign="top" align="left">
+<td valign="top" width="50%" align="left">
 
 **Languages**
 
 ${languageStats.map((stat) => {
-  const barLength = Math.round(parseFloat(stat.percentage) / 2);
-  const bar = '█'.repeat(barLength) + '░'.repeat(50 - barLength);
   const encodedLang = encodeURIComponent(stat.lang);
   const searchUrl = `https://github.com/${USERNAME}?tab=repositories&q=language:${encodedLang}`;
-  return `<span style="color: ${stat.color}">●</span> <a href="${searchUrl}" style="color: inherit; text-decoration: none;"><strong>${stat.lang}</strong></a> <span style="float: right">\`${stat.percentage}%\`</span><br>\`${bar}\``;
-}).join('<br>')}
+  // Remove # from color for shields.io
+  const colorCode = stat.color.replace('#', '');
+  
+  // Simple logo mappings for shields.io
+  const logoNames = {
+    'TypeScript': 'typescript',
+    'JavaScript': 'javascript',
+    'Python': 'python',
+    'Java': 'openjdk',
+    'C++': 'cplusplus',
+    'C': 'c',
+    'C#': 'csharp',
+    'Ruby': 'ruby',
+    'Go': 'go',
+    'Rust': 'rust',
+    'PHP': 'php',
+    'Swift': 'swift',
+    'Kotlin': 'kotlin',
+    'Dart': 'dart',
+    'HTML': 'html5',
+    'CSS': 'css3',
+    'Shell': 'gnubash',
+    'Vue': 'vuedotjs',
+    'Svelte': 'svelte',
+    'Scala': 'scala',
+    'Lua': 'lua',
+    'R': 'r',
+    'Perl': 'perl',
+    'Haskell': 'haskell',
+    'Elixir': 'elixir',
+    'Clojure': 'clojure',
+    'Objective-C': 'apple',
+    'Vim Script': 'vim',
+    'Jupyter Notebook': 'jupyter',
+    'Makefile': 'cmake',
+    'Dockerfile': 'docker',
+    'Nix': 'nixos'
+  };
+  
+  const logo = logoNames[stat.lang] || '';
+  const badgeUrl = logo 
+    ? `https://img.shields.io/badge/${encodedLang}-${stat.percentage}%25-${colorCode}?style=flat&logo=${logo}&logoColor=white`
+    : `https://img.shields.io/badge/${encodedLang}-${stat.percentage}%25-${colorCode}?style=flat`;
+  
+  const barLength = Math.round(parseFloat(stat.percentage) / 2);
+  const bar = '█'.repeat(barLength) + '░'.repeat(50 - barLength);
+    
+  return `[![${stat.lang}](${badgeUrl})](${searchUrl})  \n${bar}`;
+}).join('\n\n')}
 
 </td>
 </tr>
