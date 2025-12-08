@@ -38,6 +38,45 @@ function fetchGitHubAPI(endpoint) {
   });
 }
 
+// Fetch SVG and convert to inline with currentColor
+async function fetchAndInlineSVG(iconName) {
+  return new Promise((resolve, reject) => {
+    // Try plain version first (monochrome), fallback to original
+    const plainUrl = `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${iconName}/${iconName}-plain.svg`;
+    const originalUrl = `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${iconName}/${iconName}-original.svg`;
+    
+    const tryFetch = (url) => {
+      https.get(url, (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+          if (res.statusCode === 200) {
+            // Replace fill colors with currentColor for theme support
+            let svg = data
+              .replace(/fill="[^"]*"/g, 'fill="currentColor"')
+              .replace(/<svg/, '<svg width="16" height="16" style="vertical-align: middle; margin-right: 4px;"');
+            resolve(svg);
+          } else if (url === plainUrl) {
+            // Plain version failed, try original
+            tryFetch(originalUrl);
+          } else {
+            // Both failed, use empty SVG
+            resolve('<svg width="16" height="16"></svg>');
+          }
+        });
+      }).on('error', () => {
+        if (url === plainUrl) {
+          tryFetch(originalUrl);
+        } else {
+          resolve('<svg width="16" height="16"></svg>');
+        }
+      });
+    };
+    
+    tryFetch(plainUrl);
+  });
+}
+
 async function getLanguageStats() {
   const repos = await fetchGitHubAPI(`/users/${USERNAME}/repos?per_page=100&type=all`);
   const languageStats = {};
@@ -98,12 +137,17 @@ async function getLanguageStats() {
     'Nix': 'nixos'
   };
   
-  return sorted.map(([lang, bytes]) => {
-    const percentage = ((bytes / total) * 100).toFixed(1);
-    const iconName = languageIconNames[lang] || 'default';
-    const iconUrl = `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${iconName}/${iconName}-original.svg`;
-    return { lang, percentage, iconUrl };
-  });
+  // Fetch all SVGs in parallel
+  const languagesWithIcons = await Promise.all(
+    sorted.map(async ([lang, bytes]) => {
+      const percentage = ((bytes / total) * 100).toFixed(1);
+      const iconName = languageIconNames[lang] || 'default';
+      const svg = await fetchAndInlineSVG(iconName);
+      return { lang, percentage, svg };
+    })
+  );
+  
+  return languagesWithIcons;
 }
 
 async function getStreakStats() {
@@ -304,7 +348,7 @@ async function updateReadme() {
 ${languageStats.map((stat) => {
   const barLength = Math.round(parseFloat(stat.percentage) / 2);
   const bar = '█'.repeat(barLength) + '░'.repeat(50 - barLength);
-  return `<img src="${stat.iconUrl}" width="16" height="16" /> **${stat.lang}** \`${stat.percentage}%\`<br>\`${bar}\``;
+  return `${stat.svg} **${stat.lang}** \`${stat.percentage}%\`<br>\`${bar}\``;
 }).join('<br>')}
 
 </td>
