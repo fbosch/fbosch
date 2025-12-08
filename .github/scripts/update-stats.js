@@ -298,8 +298,7 @@ async function updateReadme() {
 </td>
 <td valign="top" width="50%" align="left">
 
-| Language | |
-|:---|:---|
+<table>
 ${languageStats.map((stat) => {
   const encodedLang = encodeURIComponent(stat.lang);
   const searchUrl = `https://github.com/${USERNAME}?tab=repositories&q=language:${encodedLang}`;
@@ -351,8 +350,9 @@ ${languageStats.map((stat) => {
   const barLength = Math.round(parseFloat(stat.percentage) / 2.5);
   const bar = '█'.repeat(barLength) + '░'.repeat(40 - barLength);
     
-  return `| [![${stat.lang}](${badgeUrl})](${searchUrl}) | \`${bar}\` |`;
+  return `<tr><td><a href="${searchUrl}"><img src="${badgeUrl}" alt="${stat.lang}"></a></td><td><code>${bar}</code></td></tr>`;
 }).join('\n')}
+</table>
 
 </td>
 </tr>
