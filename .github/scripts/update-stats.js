@@ -2,8 +2,14 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const USERNAME = process.env.USERNAME || 'fbosch';
+const USERNAME = process.env.GITHUB_USERNAME || process.env.USERNAME || 'fbosch';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+
+if (!GITHUB_TOKEN) {
+  console.error('Error: GITHUB_TOKEN environment variable is required');
+  console.error('Usage: GITHUB_TOKEN=your_token_here node .github/scripts/update-stats.js');
+  process.exit(1);
+}
 
 // Fetch data from GitHub API
 function fetchGitHubAPI(endpoint) {
@@ -33,9 +39,9 @@ function fetchGitHubAPI(endpoint) {
 }
 
 async function getLanguageStats() {
-  const repos = await fetchGitHubAPI(`/users/${USERNAME}/repos?per_page=100&type=owner`);
+  const repos = await fetchGitHubAPI(`/users/${USERNAME}/repos?per_page=100&type=all`);
   const languageStats = {};
-
+  
   for (const repo of repos) {
     if (repo.fork) continue; // Skip forked repos
     
@@ -88,7 +94,8 @@ async function getLanguageStats() {
     'Vim Script': 'vim',
     'Jupyter Notebook': 'jupyter',
     'Makefile': 'bash',
-    'Dockerfile': 'docker'
+    'Dockerfile': 'docker',
+    'Nix': 'nixos'
   };
   
   return sorted.map(([lang, bytes]) => {
@@ -97,6 +104,114 @@ async function getLanguageStats() {
     const iconUrl = `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${iconName}/${iconName}-original.svg`;
     return { lang, percentage, iconUrl };
   });
+}
+
+async function getStreakStats() {
+  try {
+    // Fetch contribution calendar data using GraphQL
+    const query = JSON.stringify({
+      query: `
+        query($username: String!) {
+          user(login: $username) {
+            contributionsCollection {
+              contributionCalendar {
+                totalContributions
+                weeks {
+                  contributionDays {
+                    contributionCount
+                    date
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: { username: USERNAME }
+    });
+
+    const data = await new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'api.github.com',
+        path: '/graphql',
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${GITHUB_TOKEN}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'Node.js'
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let responseData = '';
+        res.on('data', (chunk) => responseData += chunk);
+        res.on('end', () => {
+          if (res.statusCode === 200) {
+            resolve(JSON.parse(responseData));
+          } else {
+            reject(new Error(`GraphQL request failed with status ${res.statusCode}: ${responseData}`));
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.write(query);
+      req.end();
+    });
+
+    const days = data.data.user.contributionsCollection.contributionCalendar.weeks
+      .flatMap(week => week.contributionDays)
+      .map(day => ({
+        date: day.date,
+        count: day.contributionCount
+      }));
+
+    // Calculate current streak
+    let currentStreak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let i = days.length - 1; i >= 0; i--) {
+      const dayDate = new Date(days[i].date);
+      const diffDays = Math.floor((today - dayDate) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > currentStreak) break;
+      if (days[i].count > 0) {
+        currentStreak++;
+      } else if (currentStreak > 0) {
+        break;
+      }
+    }
+
+    // Calculate longest streak
+    let longestStreak = 0;
+    let tempStreak = 0;
+    
+    for (const day of days) {
+      if (day.count > 0) {
+        tempStreak++;
+        longestStreak = Math.max(longestStreak, tempStreak);
+      } else {
+        tempStreak = 0;
+      }
+    }
+
+    // Calculate active days this year
+    const activeDaysThisYear = days.filter(day => day.count > 0).length;
+
+    return {
+      currentStreak,
+      longestStreak,
+      activeDaysThisYear
+    };
+  } catch (err) {
+    console.error('Error fetching streak stats:', err.message);
+    return {
+      currentStreak: 0,
+      longestStreak: 0,
+      activeDaysThisYear: 0
+    };
+  }
 }
 
 async function getUserStats() {
@@ -113,12 +228,11 @@ async function getUserStats() {
 async function getContributionStats() {
   const repos = await fetchGitHubAPI(`/users/${USERNAME}/repos?per_page=100&type=all`);
   
-  // Get total stars
-  const totalStars = repos
-    .filter(repo => !repo.fork)
-    .reduce((sum, repo) => sum + repo.stargazers_count, 0);
+  // Get total stars (only count repos you own - exclude forks and repos where you're not the owner)
+  const ownedRepos = repos.filter(repo => !repo.fork && repo.owner.login === USERNAME);
+  const totalStars = ownedRepos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
   
-  // Count contributed repos (repos where user is not the owner or forks they contributed to)
+  // Count contributed repos (forks)
   const contributedTo = repos.filter(repo => repo.fork).length;
   
   // Get commits, PRs, and issues
@@ -157,31 +271,50 @@ async function updateReadme() {
   try {
     console.log('Fetching GitHub stats...');
     
-    const [userStats, languageStats, contributionStats] = await Promise.all([
+    const [userStats, languageStats, contributionStats, streakStats] = await Promise.all([
       getUserStats(),
       getLanguageStats(),
-      getContributionStats()
+      getContributionStats(),
+      getStreakStats()
     ]);
 
     const statsSection = `<div align="center">
 
-## 📊 GitHub Statistics
+<table>
+<tr>
+<td valign="top" align="left">
 
-### Profile Overview
-\`\`\`text
-⭐ Total Stars Earned        ${contributionStats.totalStars}
-🔀 Total Pull Requests       ${contributionStats.totalPRs}
-📝 Total Issues              ${contributionStats.totalIssues}
-🤝 Contributed to (repos)    ${contributionStats.contributedTo}
-\`\`\`
+**Profile**
 
-### 💻 Most Used Languages
+| Metric | Count |
+|--------|-------|
+| Total Stars | ${contributionStats.totalStars} |
+| Pull Requests | ${contributionStats.totalPRs} |
+| Issues | ${contributionStats.totalIssues} |
+| Contributed Repos | ${contributionStats.contributedTo} |
 
-${languageStats.map((stat, index) => {
+**Streaks**
+
+| Metric | Count |
+|--------|-------|
+| Current Streak | ${streakStats.currentStreak} days |
+| Longest Streak | ${streakStats.longestStreak} days |
+| Active Days (2025) | ${streakStats.activeDaysThisYear} days |
+
+</td>
+<td valign="top" align="left">
+
+**Languages**
+
+${languageStats.map((stat) => {
   const barLength = Math.round(parseFloat(stat.percentage) / 2);
   const bar = '█'.repeat(barLength) + '░'.repeat(50 - barLength);
-  return `<img src="${stat.iconUrl}" width="20" height="20" /> **${stat.lang}** ${stat.percentage}%\n\`${bar}\``;
-}).join('\n\n')}
+  return `<img src="${stat.iconUrl}" width="16" height="16" /> **${stat.lang}** \`${stat.percentage}%\`<br>\`${bar}\``;
+}).join('<br>')}
+
+</td>
+</tr>
+</table>
 
 </div>
 `;
