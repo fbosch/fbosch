@@ -355,7 +355,7 @@ ${languageStats
       Kotlin: "kotlin",
       Dart: "dart",
       HTML: "html5",
-      CSS: "css3",
+      CSS: "css",
       SCSS: "sass",
       Shell: "gnubash",
       Vue: "vuedotjs",
