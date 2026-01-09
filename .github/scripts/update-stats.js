@@ -225,7 +225,11 @@ async function getStreakStats() {
     }
 
     // Calculate active days this year
-    const activeDaysThisYear = days.filter((day) => day.count > 0).length;
+    const currentYear = new Date().getFullYear();
+    const activeDaysThisYear = days.filter((day) => {
+      const dayYear = new Date(day.date).getFullYear();
+      return dayYear === currentYear && day.count > 0;
+    }).length;
 
     return {
       currentStreak,
@@ -310,7 +314,7 @@ async function getContributionStats() {
 
 function generateSVG(userStats, languageStats, contributionStats, streakStats) {
   const width = 800;
-  const height = 390; // Adjusted for 36px spacing
+  const height = 420; // Adjusted for 40px spacing
   const padding = 20;
   const cardBg = "#0d1117";
   const cardBorder = "#30363d";
@@ -320,8 +324,8 @@ function generateSVG(userStats, languageStats, contributionStats, streakStats) {
   // Generate language bars
   const langBarsY = 80;
   const langBarHeight = 16;
-  const langBarSpacing = 36; // Increased from 32 for more breathing room
-  const langBarWidth = 340;
+  const langBarSpacing = 40; // Increased from 36 for even more breathing room
+  const langBarWidth = 340; // Full width without icons
 
   const languageBars = languageStats
     .map((stat, index) => {

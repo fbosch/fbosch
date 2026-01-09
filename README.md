@@ -9,8 +9,6 @@
 <!-- STATS:END -->
 </div>
 
----
-
 <div align="center">
 
 [website](https://bosch.dev) / [pgp](https://github.com/fbosch.gpg)
