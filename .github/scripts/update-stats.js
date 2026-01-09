@@ -188,15 +188,26 @@ async function getStreakStats() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Start from the most recent day and work backwards
     for (let i = days.length - 1; i >= 0; i--) {
       const dayDate = new Date(days[i].date);
+      dayDate.setHours(0, 0, 0, 0);
       const diffDays = Math.floor((today - dayDate) / (1000 * 60 * 60 * 24));
 
-      if (diffDays > currentStreak) break;
-      if (days[i].count > 0) {
-        currentStreak++;
-      } else if (currentStreak > 0) {
-        break;
+      // If we haven't started a streak yet, check if this day is today or yesterday
+      if (currentStreak === 0) {
+        if (diffDays > 1) break; // Too far in the past, no current streak
+        if (days[i].count > 0) {
+          currentStreak = 1;
+        }
+      } else {
+        // We have a streak going, check if this day continues it
+        if (diffDays > currentStreak) break; // Gap in the streak
+        if (days[i].count > 0) {
+          currentStreak++;
+        } else {
+          break; // Streak is broken
+        }
       }
     }
 
@@ -297,6 +308,102 @@ async function getContributionStats() {
   };
 }
 
+function generateSVG(userStats, languageStats, contributionStats, streakStats) {
+  const width = 800;
+  const height = 390; // Adjusted for 36px spacing
+  const padding = 20;
+  const cardBg = "#0d1117";
+  const cardBorder = "#30363d";
+  const textPrimary = "#e6edf3";
+  const textSecondary = "#7d8590";
+
+  // Generate language bars
+  const langBarsY = 80;
+  const langBarHeight = 16;
+  const langBarSpacing = 36; // Increased from 32 for more breathing room
+  const langBarWidth = 340;
+
+  const languageBars = languageStats
+    .map((stat, index) => {
+      const y = langBarsY + index * langBarSpacing;
+      const barWidth = (parseFloat(stat.percentage) / 100) * langBarWidth;
+
+      return `
+    <!-- ${stat.lang} -->
+    <text x="420" y="${y}" fill="${textPrimary}" font-size="13" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">${stat.lang}</text>
+    <text x="760" y="${y}" fill="${textSecondary}" font-size="12" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" text-anchor="end">${stat.percentage}%</text>
+    <rect x="420" y="${y + 4}" width="${langBarWidth}" height="${langBarHeight}" rx="4" fill="#21262d"/>
+    <rect x="420" y="${y + 4}" width="${barWidth}" height="${langBarHeight}" rx="4" fill="${stat.color}"/>`;
+    })
+    .join("\n");
+
+  // Stats items
+  const currentYear = new Date().getFullYear();
+  const statsItems = [
+    { label: "Total Stars", value: contributionStats.totalStars, icon: "⭐" },
+    { label: "Pull Requests", value: contributionStats.totalPRs, icon: "🔀" },
+    { label: "Issues", value: contributionStats.totalIssues, icon: "📋" },
+    {
+      label: "Contributed Repos",
+      value: contributionStats.contributedTo,
+      icon: "🤝",
+    },
+    {
+      label: "Current Streak",
+      value: `${streakStats.currentStreak} days`,
+      icon: "🔥",
+    },
+    {
+      label: "Longest Streak",
+      value: `${streakStats.longestStreak} days`,
+      icon: "🏆",
+    },
+    {
+      label: `Active Days (${currentYear})`,
+      value: `${streakStats.activeDaysThisYear} days`,
+      icon: "📅",
+    },
+  ];
+
+  const statsY = 80;
+  const statsSpacing = 40;
+
+  const statsElements = statsItems
+    .map((item, index) => {
+      const y = statsY + index * statsSpacing;
+      return `
+    <text x="40" y="${y}" font-size="20" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">${item.icon}</text>
+    <text x="70" y="${y}" fill="${textSecondary}" font-size="13" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">${item.label}</text>
+    <text x="360" y="${y}" fill="${textPrimary}" font-size="14" font-weight="600" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" text-anchor="end">${item.value}</text>`;
+    })
+    .join("\n");
+
+  return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .header { font-weight: 600; font-size: 16px; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="${width}" height="${height}" fill="${cardBg}" rx="6"/>
+  <rect width="${width}" height="${height}" fill="none" stroke="${cardBorder}" stroke-width="1" rx="6"/>
+  
+  <!-- Headers -->
+  <text x="40" y="40" fill="${textPrimary}" class="header" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">GitHub Stats</text>
+  <text x="420" y="40" fill="${textPrimary}" class="header" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">Top Languages</text>
+  
+  <!-- Divider -->
+  <line x1="400" y1="20" x2="400" y2="${height - 20}" stroke="${cardBorder}" stroke-width="1"/>
+  
+  <!-- Stats -->
+  ${statsElements}
+  
+  <!-- Language Bars -->
+  ${languageBars}
+</svg>`;
+}
+
 async function updateReadme() {
   try {
     console.log("Fetching GitHub stats...");
@@ -309,88 +416,23 @@ async function updateReadme() {
         getStreakStats(),
       ]);
 
+    // Generate SVG
+    const svg = generateSVG(
+      userStats,
+      languageStats,
+      contributionStats,
+      streakStats,
+    );
+
+    // Save SVG file
+    const svgPath = path.join(__dirname, "../../stats.svg");
+    fs.writeFileSync(svgPath, svg);
+    console.log("stats.svg generated successfully!");
+
+    // Update README to reference the SVG
     const statsSection = `<div align="center">
 
-<table width="100%">
-<tr>
-<td valign="top" width="50%" align="left">
-
-**Profile**
-
-| Metric | Count |
-|--------|-------|
-| Total Stars | ${contributionStats.totalStars} |
-| Pull Requests | ${contributionStats.totalPRs} |
-| Issues | ${contributionStats.totalIssues} |
-| Contributed Repos | ${contributionStats.contributedTo} |
-| Current Streak | ${streakStats.currentStreak} days |
-| Longest Streak | ${streakStats.longestStreak} days |
-| Active Days (2025) | ${streakStats.activeDaysThisYear} days |
-
-</td>
-<td valign="top" width="50%" align="left">
-
-<table>
-${languageStats
-  .map((stat) => {
-    const encodedLang = encodeURIComponent(stat.lang);
-    const searchUrl = `https://github.com/${USERNAME}?tab=repositories&q&type=source&language=${encodedLang.toLowerCase()}&sort`;
-    // Remove # from color for shields.io
-    const colorCode = stat.color.replace("#", "");
-
-    // Simple logo mappings for shields.io
-    const logoNames = {
-      TypeScript: "typescript",
-      JavaScript: "javascript",
-      Python: "python",
-      Java: "openjdk",
-      "C++": "cplusplus",
-      C: "c",
-      "C#": "csharp",
-      Ruby: "ruby",
-      Go: "go",
-      Rust: "rust",
-      PHP: "php",
-      Swift: "swift",
-      Kotlin: "kotlin",
-      Dart: "dart",
-      HTML: "html5",
-      CSS: "css",
-      SCSS: "sass",
-      Shell: "gnubash",
-      Vue: "vuedotjs",
-      Svelte: "svelte",
-      Scala: "scala",
-      Lua: "lua",
-      R: "r",
-      Perl: "perl",
-      Haskell: "haskell",
-      Elixir: "elixir",
-      Clojure: "clojure",
-      "Objective-C": "apple",
-      "Vim Script": "vim",
-      "Jupyter Notebook": "jupyter",
-      Makefile: "cmake",
-      Dockerfile: "docker",
-      Nix: "nixos",
-    };
-
-    const logo = logoNames[stat.lang] || "";
-    const badgeUrl = logo
-      ? `https://img.shields.io/badge/${encodedLang}-${stat.percentage}%25-${colorCode}?style=flat&logo=${logo}&logoColor=white`
-      : `https://img.shields.io/badge/${encodedLang}-${stat.percentage}%25-${colorCode}?style=flat`;
-
-    const barLength = Math.round(parseFloat(stat.percentage) / 2.5);
-    const bar = "█".repeat(barLength) + "░".repeat(40 - barLength);
-
-    return `<tr><td><a href="${searchUrl}"><img src="${badgeUrl}" alt="${stat.lang}"></a></td><td><code>${bar}</code></td></tr>`;
-  })
-  .join("\n")}
-</table>
-
-</td>
-</tr>
-</table>
+![GitHub Stats](./stats.svg)
 
 </div>
 `;
