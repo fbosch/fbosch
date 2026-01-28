@@ -1,15 +1,24 @@
-<div>
-<!-- STATS:START -->
 <div align="center">
 
-![GitHub Stats](./stats.svg)
-
-</div>
-
-<!-- STATS:END -->
-</div>
-
-<div align="center">
+```
+                    .   .xXXXX+.   .
+               .   ..   xXXXX+.-   ..   .
+         .   ..  ... ..xXXXX+. --.. ...  ..   .
+     .   ..  ... .....xXXXX+.  -.-..... ...  ..   .
+   .   ..  ... ......xXXXX+.  . .--...... ...  ..   .
+  .   ..  ... ......xXXXX+.    -.- -...... ...  ..   .
+ .   ..  ... ......xXXXX+.   .-+-.-.-...... ...  ..   .
+ .   ..  ... .....xXXXX+. . --xx+.-.--..... ...  ..   .
+.   ..  ... .....xXXXX+. - .-xxxx+- .-- .... ...  ..   .
+ .   ..  ... ...xXXXX+.  -.-xxxxxx+ .---... ...  ..   .
+ .   ..  ... ..xXXXX+. .---..xxxxxx+-..--.. ...  ..   .
+  .   ..  ... xXXXX+. . --....xxxxxx+  -.- ...  ..   .
+   .   ..  ..xXXXX+. . .-......xxxxxx+-. --..  ..   .
+     .   .. xXXXXXXXXXXXXXXXXXXXxxxxxx+. .-- ..   .
+         . xXXXXXXXXXXXXXXXXXXXXXxxxxxx+.  -- .
+           xxxxxxxxxxxxxxxxxxxxxxxxxxxxx+.--
+            xxxxxxxxxxxxxxxxxxxxxxxxxxxxx+-
+```
 
 [website](https://bosch.dev) / [pgp](https://github.com/fbosch.gpg)
 
