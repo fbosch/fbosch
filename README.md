@@ -6,8 +6,4 @@
 ╲_______╱ ╲________╱╲________╱╲________╱╲________╱╲___╱____╱
 ```
 
-<div align="center">
-
 [website](https://bosch.dev) / [pgp](https://github.com/fbosch.gpg)
-
-</div>
