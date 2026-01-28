@@ -11,9 +11,6 @@
     <a href="https://github.com/fbosch/nixos">
         <img align="right" alt="nixos" src="https://img.shields.io/badge/NixOS-5277C3?style=flat&logo=nixos&logoColor=white" />
     </a>
-    <a href="https://github.com/fbosch/nixos/blob/master/modules/hosts/rvn-mac.nix">
-        <img align="right" alt="macos" src="https://img.shields.io/badge/macOS-000000?style=flat&logo=apple&logoColor=white" />
-    </a>
     <a href="https://github.com/fbosch/dotfiles/tree/master/.config/hypr">
         <img align="right" alt="hyprland" src="https://img.shields.io/badge/Hyprland-58E1FF?logo=hyprland&logoColor=000" />
     </a>
