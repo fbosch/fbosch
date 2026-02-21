@@ -26,6 +26,9 @@
     <a href="https://github.com/fbosch/dotfiles/tree/master/.config/wezterm">
         <img align="right" alt="wezterm" src="https://img.shields.io/badge/Wezterm-4E49EE?logo=wezterm&logoColor=fff" />
     </a>
+    <a href="https://help.kagi.com/kagi/company/">
+        <img align="right" alt="Kagi Search" src="https://img.shields.io/badge/kagi-yellow?logo=kagi&logoColor=white">
+    </a>
 </div>
 
 
